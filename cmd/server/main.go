@@ -10,10 +10,15 @@ import (
 )
 
 func main() {
+	chain := middleware.Chain(
+		middleware.RecoveryMiddleware,
+		middleware.LoggingMiddleware,
+	)
+
 	r := router.New()
-	r.Handle("GET", "/hello", middleware.LoggingMiddleware(http.HandlerFunc(handlers.HelloHandler)))
-	r.Handle("GET", "/time", middleware.LoggingMiddleware(http.HandlerFunc(handlers.TimeHandler)))
-	r.Handle("POST", "/echo", middleware.LoggingMiddleware(http.HandlerFunc(handlers.EchoHandler)))
+	r.Handle("GET", "/hello", chain(http.HandlerFunc(handlers.HelloHandler)))
+	r.Handle("GET", "/time", chain(http.HandlerFunc(handlers.TimeHandler)))
+	r.Handle("POST", "/echo", chain(http.HandlerFunc(handlers.EchoHandler)))
 
 	s := server.New(":8080", r)
 	s.Start()
